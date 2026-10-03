@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>倉橋島 3Dマップ</title>
+  <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
+  <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+  <style>
+    html, body, #map { margin: 0; height: 100%; }
+  </style>
+</head>
+<body>
+  <div id="map"></div>
+  <script type="module">
+    import { useGsiTerrainSource } from 'https://www.unpkg.com/maplibre-gl-gsi-terrain@2.3.0/dist/terrain.js';
+
+    const gsiTerrainSource = useGsiTerrainSource(maplibregl.addProtocol);
+
+    const map = new maplibregl.Map({
+      container: 'map',
+      center: [132.5, 34.1],
+      zoom: 13,
+      pitch: 60,
+      maxPitch: 80,
+      hash: true,
+      style: {
+        version: 8,
+        sources: {
+          gsi: {
+            type: 'raster',
+            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+            tileSize: 256,
+            attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>'
+          },
+          terrain: gsiTerrainSource
+        },
+        layers: [{ id: 'gsi', type: 'raster', source: 'gsi' }],
+        terrain: { source: 'terrain', exaggeration: 1.2 }
+      }
+    });
+
+    map.addControl(new maplibregl.NavigationControl({ visualizePitch: true }));
+  </script>
+</body>
+</html>
