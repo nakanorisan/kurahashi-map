@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>倉橋島 3Dマップ</title>
+  <title>倉橋島 本浦 3Dマップ</title>
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" />
   <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
   <style>
@@ -15,27 +15,39 @@
   <script type="module">
     import { useGsiTerrainSource } from 'https://www.unpkg.com/maplibre-gl-gsi-terrain@2.3.0/dist/terrain.js';
 
+    // ===== ここの数字を直すと、表示する場所と広さが変わります =====
+    const CENTER = [132.51, 34.10]; // 中心の位置（経度, 緯度）
+    const HALF_LNG = 0.015;         // 東西の広さ（中心から片側）
+    const HALF_LAT = 0.012;         // 南北の広さ（中心から片側）
+    // ==============================================================
+
     const gsiTerrainSource = useGsiTerrainSource(maplibregl.addProtocol);
 
     const map = new maplibregl.Map({
       container: 'map',
-      center: [132.5, 34.1],
-      zoom: 13,
+      center: CENTER,
+      zoom: 15,
+      minZoom: 14,
+      maxZoom: 18,
       pitch: 60,
       maxPitch: 80,
-      hash: true,
+      maxBounds: [
+        [CENTER[0] - HALF_LNG, CENTER[1] - HALF_LAT],
+        [CENTER[0] + HALF_LNG, CENTER[1] + HALF_LAT]
+      ],
       style: {
         version: 8,
         sources: {
-          gsi: {
+          photo: {
             type: 'raster',
-            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/pale/{z}/{x}/{y}.png'],
+            tiles: ['https://cyberjapandata.gsi.go.jp/xyz/seamlessphoto/{z}/{x}/{y}.jpg'],
             tileSize: 256,
+            maxzoom: 18,
             attribution: '<a href="https://maps.gsi.go.jp/development/ichiran.html">地理院タイル</a>'
           },
           terrain: gsiTerrainSource
         },
-        layers: [{ id: 'gsi', type: 'raster', source: 'gsi' }],
+        layers: [{ id: 'photo', type: 'raster', source: 'photo' }],
         terrain: { source: 'terrain', exaggeration: 1.2 }
       }
     });
